@@ -23,13 +23,12 @@ class NewsAdapter : RecyclerView.Adapter<NewsViewHolder>(){
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem = items[position]
         holder.newsTitle.text = currentItem.title
-//        Glide.with(context).load(article.urlToImage).into(holder.newsImage)
+        Glide.with(holder.itemView.context).load(currentItem.imageUrl).into(holder.newsImage)
     }
 
     fun updateNews(updatedNews: ArrayList<News>){
         items.clear()
         items.addAll(updatedNews)
-
         notifyDataSetChanged()
     }
 

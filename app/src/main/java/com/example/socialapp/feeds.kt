@@ -1,11 +1,11 @@
 package com.example.socialapp
 
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
@@ -16,6 +16,7 @@ class feeds : AppCompatActivity() {
 
     private lateinit var mAdapter: NewsAdapter
     lateinit var recycler: RecyclerView
+    lateinit var swipeRefresh: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.statusBarColor = ContextCompat.getColor(this, R.color.default_color)
@@ -25,17 +26,23 @@ class feeds : AppCompatActivity() {
 
         recycler = findViewById(R.id.recycler)
         recycler.layoutManager = LinearLayoutManager(this)
-        fetchData()
         val madapter: NewsAdapter = NewsAdapter()
         recycler.adapter = madapter
+        fetchData()
+
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            fetchData()
+//            swipeRefresh.isRefreshing = false
+        }
+
     }
     private fun fetchData(){
-//        val mAdapter: NewsAdapter = NewsAdapter()
         val jsonObjectRequest = JsonObjectRequest(
             Request.Method.GET,
             url,
             null,
-            Response.Listener{
+            {
                 val newsJsonArray = it.getJSONArray("articles")
                 val newsArray = ArrayList<News>()
                 for (i in 0 until newsJsonArray.length()){
@@ -44,13 +51,13 @@ class feeds : AppCompatActivity() {
                         newsJsonObject.getString("title"),
                         newsJsonObject.getString("author"),
                         newsJsonObject.getString("url"),
-                        newsJsonObject.getString("urTolImage"),
+                        newsJsonObject.getString("urlToImage"),
                     )
                     newsArray.add(news)
                 }
                 mAdapter.updateNews(newsArray)
             },
-            Response.ErrorListener{
+            {
 
             }
         )
